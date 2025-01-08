@@ -8,7 +8,7 @@ spring:
     name: nebula-pics-service
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/nebula-pics
+    url: jdbc:mysql://localhost:3306/nebula_pics
     username: root
     password: 123456
 

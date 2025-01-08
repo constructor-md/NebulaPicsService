@@ -6,7 +6,7 @@ import lombok.Data;
  * 分页请求包装类
  */
 @Data
-public class PageResult {
+public class PageRequest {
 
     // 当前页号
     private int current = 1;
