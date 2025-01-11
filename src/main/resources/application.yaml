@@ -11,6 +11,8 @@ spring:
     url: jdbc:mysql://localhost:3306/nebula_pics
     username: root
     password: 123456
+  profiles:
+    active: local
 
 mybatis-plus:
   configuration:

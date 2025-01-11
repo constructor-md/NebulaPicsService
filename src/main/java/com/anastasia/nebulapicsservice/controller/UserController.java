@@ -8,7 +8,7 @@ import com.anastasia.nebulapicsservice.constant.UserConstant;
 import com.anastasia.nebulapicsservice.exception.BusinessException;
 import com.anastasia.nebulapicsservice.exception.ErrorCode;
 import com.anastasia.nebulapicsservice.exception.ThrowUtils;
-import com.anastasia.nebulapicsservice.model.dto.*;
+import com.anastasia.nebulapicsservice.model.dto.user.*;
 import com.anastasia.nebulapicsservice.model.entity.User;
 import com.anastasia.nebulapicsservice.model.vo.LoginUserVO;
 import com.anastasia.nebulapicsservice.model.vo.UserVO;

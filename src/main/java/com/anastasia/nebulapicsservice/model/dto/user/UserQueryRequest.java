@@ -1,4 +1,4 @@
-package com.anastasia.nebulapicsservice.model.dto;
+package com.anastasia.nebulapicsservice.model.dto.user;
 
 import com.anastasia.nebulapicsservice.common.PageRequest;
 import lombok.Data;

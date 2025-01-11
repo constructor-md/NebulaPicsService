@@ -1,6 +1,6 @@
 package com.anastasia.nebulapicsservice.service;
 
-import com.anastasia.nebulapicsservice.model.dto.UserQueryRequest;
+import com.anastasia.nebulapicsservice.model.dto.user.UserQueryRequest;
 import com.anastasia.nebulapicsservice.model.entity.User;
 import com.anastasia.nebulapicsservice.model.vo.LoginUserVO;
 import com.anastasia.nebulapicsservice.model.vo.UserVO;
@@ -80,4 +80,9 @@ public interface UserService extends IService<User> {
      * @return
      */
     String getEncryptPassword(String userPassword);
+
+    /**
+     * 是否是管理员
+     */
+    boolean isAdmin(User user);
 }

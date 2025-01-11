@@ -5,7 +5,7 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.anastasia.nebulapicsservice.exception.BusinessException;
 import com.anastasia.nebulapicsservice.exception.ErrorCode;
-import com.anastasia.nebulapicsservice.model.dto.UserQueryRequest;
+import com.anastasia.nebulapicsservice.model.dto.user.UserQueryRequest;
 import com.anastasia.nebulapicsservice.model.enums.UserRoleEnum;
 import com.anastasia.nebulapicsservice.model.vo.LoginUserVO;
 import com.anastasia.nebulapicsservice.model.vo.UserVO;
@@ -199,7 +199,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return DigestUtils.md5DigestAsHex((salt + userPassword).getBytes(StandardCharsets.UTF_8));
     }
 
-
+    @Override
+    public boolean isAdmin(User user) {
+        return user != null && UserRoleEnum.ADMIN.getValue().equals(user.getUserRole());
+    }
 }
 
 
