@@ -1,6 +1,8 @@
 package com.anastasia.nebulapicsservice.service;
 
 import com.anastasia.nebulapicsservice.model.dto.picture.PictureQueryRequest;
+import com.anastasia.nebulapicsservice.model.dto.picture.PictureReviewRequest;
+import com.anastasia.nebulapicsservice.model.dto.picture.PictureUploadByBatchRequest;
 import com.anastasia.nebulapicsservice.model.dto.picture.PictureUploadRequest;
 import com.anastasia.nebulapicsservice.model.entity.Picture;
 import com.anastasia.nebulapicsservice.model.entity.User;
@@ -8,27 +10,25 @@ import com.anastasia.nebulapicsservice.model.vo.PictureVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
-* @author 82611
-* @description 针对表【picture(图片)】的数据库操作Service
-* @createDate 2025-01-10 15:58:54
-*/
+ * @author 82611
+ * @description 针对表【picture(图片)】的数据库操作Service
+ * @createDate 2025-01-10 15:58:54
+ */
 public interface PictureService extends IService<Picture> {
 
     /**
      * 上传图片
      *
-     * @param multipartFile 图片文件
+     * @param inputSource          图片文件或URL
      * @param pictureUploadRequest 上传请求信息
-     * @param loginUser 当前登录用户
+     * @param loginUser            当前登录用户
      * @return 图片信息
      */
-    PictureVO uploadPicture(MultipartFile multipartFile,
+    PictureVO uploadPicture(Object inputSource,
                             PictureUploadRequest pictureUploadRequest,
                             User loginUser);
 
@@ -63,4 +63,29 @@ public interface PictureService extends IService<Picture> {
      * @param picture 图片数据
      */
     void validPicture(Picture picture);
+
+    /**
+     * 图片审核
+     *
+     * @param pictureReviewRequest
+     * @param loginUser
+     */
+    void doPictureReview(PictureReviewRequest pictureReviewRequest, User loginUser);
+
+    /**
+     * 填充审核参数
+     *
+     * @param picture
+     * @param loginUser
+     */
+    void fillReviewParams(Picture picture, User loginUser);
+
+    /**
+     * 批量抓取和创建图片
+     *
+     * @param pictureUploadByBatchRequest
+     * @param loginUser
+     * @return
+     */
+    Integer uploadPictureByBatch(PictureUploadByBatchRequest pictureUploadByBatchRequest, User loginUser);
 }
