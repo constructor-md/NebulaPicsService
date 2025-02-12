@@ -1,7 +1,9 @@
 package com.anastasia.nebulapicsservice.manage;
 
+import cn.hutool.core.io.FileUtil;
 import com.anastasia.nebulapicsservice.config.CosClientConfig;
 import com.qcloud.cos.COSClient;
+import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.PutObjectRequest;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class CosManager {
@@ -44,14 +48,40 @@ public class CosManager {
      * 上传对象
      * 返回结果附带图片信息
      */
-    public PutObjectResult putObjectResult(String key, File file) {
+    public PutObjectResult putPictureObject(String key, File file) {
         PutObjectRequest putObjectRequest = new PutObjectRequest(config.getBucket(), key, file);
         // 图片处理（获取基本信息也被视为一种处理）
         PicOperations picOperations = new PicOperations();
         // 1 表示返回原图信息
         picOperations.setIsPicInfo(1);
+        List<PicOperations.Rule> rules = new ArrayList<>();
+        // 图片压缩 转成webp格式
+        String webpKey = FileUtil.mainName(key) + ".webp";
+        PicOperations.Rule compressRule = new PicOperations.Rule();
+        compressRule.setRule("imageMogr2/format/webp");
+        compressRule.setBucket(config.getBucket());
+        compressRule.setFileId(webpKey);
+        rules.add(compressRule);
+        // 缩略图处理 仅处理 > 20KB 的图片生成缩略图
+        if (file.length() > 2 * 1024) {
+            PicOperations.Rule thumbnailRule = new PicOperations.Rule();
+            thumbnailRule.setBucket(config.getBucket());
+            String thumbnailKey = FileUtil.mainName(key) + "_thumbnail." + FileUtil.getSuffix(key);
+            thumbnailRule.setFileId(thumbnailKey);
+            // 缩放规则 /thumbnail/<Width>x<Height>> (如果大于原图宽高则不处理)
+            thumbnailRule.setRule(String.format("imageMogr2/thumbnail/%sx%s>", 128, 128));
+            rules.add(thumbnailRule);
+        }
         // 构造处理参数
+        picOperations.setRules(rules);
         putObjectRequest.setPicOperations(picOperations);
         return cosClient.putObject(putObjectRequest);
+    }
+
+    /**
+     * 删除对象
+     */
+    public void deleteObject(String key) throws CosClientException {
+        cosClient.deleteObject(config.getBucket(), key);
     }
 }

@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.anastasia.nebulapicsservice.exception.BusinessException;
 import com.anastasia.nebulapicsservice.exception.ErrorCode;
 import com.anastasia.nebulapicsservice.exception.ThrowUtils;
+import com.anastasia.nebulapicsservice.manage.CosManager;
 import com.anastasia.nebulapicsservice.manage.upload.FilePictureUpload;
 import com.anastasia.nebulapicsservice.manage.upload.PictureUploadTemplate;
 import com.anastasia.nebulapicsservice.manage.upload.UrlPictureUpload;
@@ -31,6 +32,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -60,6 +62,9 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private CosManager cosManager;
 
     @Override
     public PictureVO uploadPicture(Object inputSource, PictureUploadRequest pictureUploadRequest, User loginUser) {
@@ -96,6 +101,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         // 构造要入库的图片信息
         Picture picture = new Picture();
         picture.setUrl(uploadPictureResult.getUrl());
+        picture.setUrl(uploadPictureResult.getThumbnailUrl());
         picture.setName(picName);
         picture.setPicSize(uploadPictureResult.getPicSize());
         picture.setPicWidth(uploadPictureResult.getPicWidth());
@@ -321,6 +327,27 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             }
         }
         return uploadCount;
+    }
+
+    @Async
+    @Override
+    public void clearPictureFile(Picture oldPicture) {
+        // 判断该图片是否被多条记录使用
+        String pictureUrl = oldPicture.getUrl();
+        long count = this.lambdaQuery()
+                .eq(Picture::getUrl, pictureUrl)
+                .count();
+        // 如果有不止一条记录用到该图片，则不删除
+        if (count > 1) {
+            return;
+        }
+        // FIXME 这里 url 包含域名 实际上只需要传 key 值即可
+        cosManager.deleteObject(pictureUrl);
+        // 清理缩略图
+        String thumbnailUrl = oldPicture.getThumbnailUrl();
+        if (StrUtil.isNotBlank(thumbnailUrl)) {
+            cosManager.deleteObject(thumbnailUrl);
+        }
     }
 }
 
